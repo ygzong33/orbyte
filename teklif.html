@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Teklif Modülü | System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+    <style>
+        body.teklif-bg {
+            background: url('img/teklif_arkaplan.png') center center/cover no-repeat fixed !important;
+        }
+
+        body.teklif-bg:before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(5, 5, 5, 0.85);
+            z-index: 0;
+        }
+
+        .form-section {
+            position: relative;
+            z-index: 1;
+            background: none;
+            box-shadow: 0 0 24px 0 rgba(0, 255, 0, 0.08);
+            padding: 32px 0;
+        }
+    </style>
+</head>
+
+<body class="hacker-theme teklif-bg">
+
+    <header>
+        <div class="container">
+            <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
+                        class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#services">/HİZMETLER</a></li>
+                    <li><a href="iletisim.html">/İLETİŞİM</a></li>
+                    <li><a href="hakkimizda.html" class="active">/HAKKIMIZDA</a></li>
+                    <li><a href="admin.html">/YÖNETİM</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="form-section">
+        <div class="container">
+            <h2 class="section-title">/YENİ_PROJE_BAŞLAT</h2>
+            <p class="terminal-text">Formu doldurun, sistem otomatik olarak WhatsApp üzerinden iletişime geçecektir.</p>
+
+            <form id="offerForm" class="cyber-form">
+
+                <div class="form-group">
+                    <label>> AD_SOYAD:</label>
+                    <input type="text" id="adsoyad" class="terminal-input" required placeholder="_">
+                </div>
+
+                <div class="form-group">
+                    <label>> İLETİŞİM_NO (Size ulaşmamız için):</label>
+                    <input type="tel" id="telefon" class="terminal-input" inputmode="numeric" required
+                        placeholder="05xx xxx xxxx" maxlength="13">
+                </div>
+
+                <div class="form-group">
+                    <label>> HİZMET_TÜRÜ:</label>
+                    <select id="hizmet" class="terminal-input">
+                        <option value="Kamera Sistemleri">Kamera & Alarm</option>
+                        <option value="Sunucu Kurulumu">Sunucu & PC</option>
+                        <option value="Web Tasarım">Web Tasarım & Hosting</option>
+                        <option value="Güneş Paneli">Güneş Paneli</option>
+                        <option value="Restoran Sistemi">Restoran/Menü</option>
+                        <option value="Farklı Bir Hizmet">Farklı Bir Hizmet</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>> DETAYLAR:</label>
+                    <textarea id="mesaj" class="terminal-input" rows="4" placeholder="Proje detayı..."></textarea>
+                </div>
+
+                <button type="button" onclick="kaydetVeGonder()" class="cyber-btn-submit">
+                    [ SİSTEME GÖNDER ]
+                </button>
+            </form>
+
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+
+    <script>
+        function kaydetVeGonder() {
+            // 1. VERİLERİ AL
+            var ad = document.getElementById("adsoyad").value;
+            var tel = document.getElementById("telefon").value; // Telefonu alıyoruz
+            var hizmet = document.getElementById("hizmet").value;
+            var not = document.getElementById("mesaj").value;
+            var tarih = new Date().toLocaleString();
+
+            // 2. BOŞ ALAN KONTROLÜ
+            if (ad === "" || tel === "") {
+                alert("HATA: İsim ve Telefon alanları zorunludur!");
+                return;
+            }
+
+            // 3. VERİTABANI İŞLEMİ (Local Storage - Admin Paneli İçin)
+            try {
+                var mevcutVeri = localStorage.getItem('gelenTeklifler');
+                var teklifler = mevcutVeri ? JSON.parse(mevcutVeri) : [];
+
+                teklifler.push({
+                    tarih: tarih,
+                    ad: ad,
+                    tel: tel, // Telefonu da kaydediyoruz
+                    hizmet: hizmet,
+                    not: not
+                });
+
+                localStorage.setItem('gelenTeklifler', JSON.stringify(teklifler));
+
+                // Başarılı uyarısı
+                alert("BAŞARILI: Teklif alındı! WhatsApp yönlendirmesi yapılıyor...");
+
+            } catch (error) {
+                alert("Kayıt hatası: " + error);
+            }
+
+            // 4. WHATSAPP YÖNLENDİRMESİ
+            // BURAYA KENDİ NUMARANI YAZ (Başında 90 olsun, + koyma)
+            var myPhone = "905491679067";
+
+            var text = "*YENİ TEKLİF TALEBİ* %0A" +
+                "-------------------%0A" +
+                "*Tarih:* " + tarih + "%0A" +
+                "*Müşteri:* " + ad + "%0A" +
+                "*Tel:* " + tel + "%0A" +  // Telefon mesajda da görünecek
+                "*Hizmet:* " + hizmet + "%0A" +
+                "*Not:* " + not;
+
+            window.open("https://wa.me/" + myPhone + "?text=" + text, "_blank");
+
+            // Formu temizle
+            document.getElementById("offerForm").reset();
+        }
+
+        // Ad Soyad Baş Harf Büyütme
+        document.getElementById('adsoyad').addEventListener('input', function () {
+            var str = this.value;
+            var words = str.split(" ");
+            for (var i = 0; i < words.length; i++) {
+                if (words[i].length > 0) {
+                    words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+                }
+            }
+            this.value = words.join(" ");
+        });
+    </script>
+
+    <!-- AI CHAT WIDGET HTML -->
+    <div class="chat-widget-btn" onclick="toggleChat()">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-title">
+                <span class="chat-status"></span>
+                AI ASİSTAN
+            </div>
+            <button class="close-chat" onclick="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                Merhaba! Ben Orbyte AI asistanı. Size nasıl yardımcı olabilirim?
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Mesajınızı yazın..."
+                onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // CHAT WIDGET LOGIC
+        const chatWindow = document.getElementById('chatWindow');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+
+        function toggleChat() {
+            chatWindow.classList.toggle('active');
+            if (chatWindow.classList.contains('active')) {
+                chatInput.focus();
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (message === "") return;
+
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+
+            // Simulate typing and bot response
+            showTypingIndicator();
+
+            // Simple keyword-based response logic
+            setTimeout(() => {
+                removeTypingIndicator();
+                const botResponse = generateResponse(message);
+                addMessage(botResponse, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.innerText = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('typing-indicator');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typingDiv = document.getElementById('typingIndicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        // GELİŞMİŞ YAPAY ZEKA MANTIĞI
+
+        // Bilgi Bankası (MASSIVE EXPANSION)
+        const knowledgeBase = [
+            // --- SELAMLAŞMA & TANIŞMA ---
+            { keywords: ["merhaba", "selam", "hi", "hey", "günaydın", "iyi akşamlar", "iyi geceler"], response: "Merhaba! Orbyte AI asistanı hizmetinizde. Size web tasarım, güvenlik sistemleri, sunucu çözümleri veya enerji sistemleri hakkında nasıl yardımcı olabilirim?" },
+            { keywords: ["nasılsın", "nasıl gidiyor", "naber", "ne var ne yok"], response: "Sanal bir varlık olarak harikayım! İşlemcilerim %100 verimle çalışıyor. Sizin projeniz nasıl gidiyor, yardımcı olabilir miyim?" },
+            { keywords: ["kimsin", "nesin", "adın ne", "sen kimsin"], response: "Ben Orbyte Teknoloji'nin gelişmiş yapay zeka asistanıyım. 7/24 sorularınızı yanıtlamak ve size en uygun teknolojik çözümleri sunmak için programlandım." },
+            { keywords: ["gerçek misin", "insan mısın", "robot musun"], response: "Ben bir yapay zeka botuyum, ama ekibimizdeki gerçek mühendisler kadar yardımsever olmaya çalışıyorum! :)" },
+            { keywords: ["teşekkür", "sağol", "eyvallah", "mersi"], response: "Rica ederim! Size yardımcı olabildiysem ne mutlu bana. Başka bir sorunuz var mı?" },
+            { keywords: ["görüşürüz", "bye", "hoşçakal", "iyi günler", "kolay gelsin"], response: "Görüşmek üzere! Kendinize iyi bakın. Projenizi hayata geçirmek için teklif formunu doldurmayı unutmayın." },
+
+            // --- GENEL FİRMA BİLGİLERİ ---
+            { keywords: ["iletişim", "telefon", "tel", "numara", "cep", "ulaşım"], response: "Bize 7/24 şu numaradan ulaşabilirsiniz: 0549 167 90 67. Ayrıca WhatsApp üzerinden de yazabilirsiniz." },
+            { keywords: ["adres", "yeriniz", "neredesiniz", "konum", "ofis"], response: "Merkez ofisimiz İstanbul'dadır. Ancak dijital çağda sınırlarımız yok, Türkiye'nin her yerine ve yurt dışına hizmet veriyoruz." },
+            { keywords: ["mail", "eposta", "e-mail", "email"], response: "Bize info@orbyte.com adresinden e-posta gönderebilirsiniz. Genellikle 1 saat içinde dönüş yapıyoruz." },
+            { keywords: ["referans", "örnek", "portfolyo", "yaptığınız işler"], response: "Yüzlerce mutlu müşterimiz var! Web sitemizin 'Projelerimiz' bölümünden referanslarımızı inceleyebilir veya sektörünüze özel örnekler için bizimle iletişime geçebilirsiniz." },
+            { keywords: ["fiyat", "ücret", "kaç para", "maliyet", "bütçe", "pahalı mı"], response: "Her proje parmak izi gibidir, size özeldir. Standart bir fiyat listemiz yok çünkü ihtiyaçlarınıza göre en uygun bütçeyi çıkarıyoruz. Lütfen formu doldurun, size özel bir teklif hazırlayalım." },
+            { keywords: ["süre", "zaman", "ne zaman biter", "teslimat"], response: "Proje süresi kapsamına göre değişir. Kurumsal bir web sitesi 1 hafta, kapsamlı bir e-ticaret sitesi 3-4 hafta, güvenlik sistemi kurulumu ise 1-3 gün sürebilir." },
+
+            // --- WEB TASARIM & YAZILIM ---
+            { keywords: ["web", "site", "internet sitesi", "kurumsal site"], response: "Modern, hızlı ve SEO uyumlu web siteleri yapıyoruz. İster kurumsal tanıtım sitesi, ister kişisel blog olsun, en son teknolojileri (HTML5, CSS3, JS) kullanıyoruz." },
+            { keywords: ["e-ticaret", "satış sitesi", "online satış", "mağaza"], response: "E-ticaret paketlerimizle ürünlerinizi dünyaya açın! Sanal POS entegrasyonu, kargo takibi ve stok yönetimi içeren tam kapsamlı sistemler kuruyoruz." },
+            { keywords: ["seo", "arama motoru", "google", "sıralama"], response: "Sitenizi sadece kurmuyoruz, Google'da üst sıralara taşıyoruz. SEO (Arama Motoru Optimizasyonu) hizmetimizle görünürlüğünüzü artırın." },
+            { keywords: ["mobil", "uygulama", "app", "ios", "android"], response: "Fikrinizi cebinize taşıyalım! iOS ve Android için native veya hybrid (React Native, Flutter) mobil uygulamalar geliştiriyoruz." },
+            { keywords: ["özel yazılım", "crm", "erp", "otomasyon"], response: "Şirketinizin iş akışına özel yazılımlar üretiyoruz. CRM, ERP, stok takip veya personel yönetim sistemleri ile verimliliğinizi artırın." },
+            { keywords: ["wordpress", "wp", "tema"], response: "WordPress uzmanıyız! Özel tema tasarımı, eklenti geliştirme ve hız optimizasyonu hizmetleri veriyoruz." },
+            { keywords: ["react", "vue", "angular", "node", "php", "python"], response: "Modern teknoloji yığınlarını (MERN, LAMP, Python/Django) kullanarak ölçeklenebilir ve güvenli web uygulamaları geliştiriyoruz." },
+
+            // --- SUNUCU & HOSTING ---
+            { keywords: ["sunucu", "server", "vps", "vds", "dedicated"], response: "Yüksek performanslı sunucu çözümlerimiz var. İster paylaşımlı hosting, ister size özel dedike sunucu (Dedicated) veya bulut sunucu (VPS) kiralayabilirsiniz." },
+            { keywords: ["hosting", "barındırma", "domain", "alan adı"], response: "Web siteniz için hızlı ve güvenli hosting paketlerimiz mevcut. Ayrıca .com, .net, .com.tr gibi alan adlarınızı tescil ediyoruz." },
+            { keywords: ["yedek", "backup", "veri kaybı"], response: "Verileriniz bizimle güvende. Günlük ve haftalık otomatik yedekleme çözümlerimizle veri kaybı riskini sıfıra indiriyoruz." },
+            { keywords: ["güvenlik", "siber", "firewall", "ddos"], response: "Siber güvenlik hizmetlerimizle sunucularınızı ve ağınızı saldırılara karşı koruyoruz. Firewall kurulumu ve penetrasyon testleri yapıyoruz." },
+
+            // --- GÜVENLİK SİSTEMLERİ ---
+            { keywords: ["kamera", "cctv", "güvenlik kamerası", "ip kamera"], response: "Evinizi ve iş yerinizi 7/24 izleyin. Gece görüşlü, hareket sensörlü, yüksek çözünürlüklü (4K) IP kamera sistemleri kuruyoruz." },
+            { keywords: ["alarm", "hırsız", "yangın", "dedektör"], response: "Hırsız ve yangın alarm sistemlerimizle gözünüz arkada kalmasın. Mobil uygulama üzerinden anlık bildirim alabilir, sistemi uzaktan kontrol edebilirsiniz." },
+            { keywords: ["kayıt", "dvr", "nvr", "izleme"], response: "Kayıt cihazlarımızla (NVR/DVR) haftalarca geriye dönük kayıt tutabilir, internet olan her yerden canlı izleyebilirsiniz." },
+
+            // --- ENERJİ SİSTEMLERİ ---
+            { keywords: ["güneş", "panel", "solar", "enerji", "elektrik"], response: "Güneş enerjisiyle kendi elektriğinizi üretin! Çatı tipi veya arazi tipi güneş paneli kurulumları yapıyoruz. Faturanızı sıfırlayın." },
+            { keywords: ["inverter", "akü", "batarya", "depolama"], response: "Enerji depolama çözümlerimizle elektrik kesintilerinden etkilenmeyin. Hibrit inverter ve lityum akü sistemleri kuruyoruz." },
+
+            // --- RESTORAN SİSTEMLERİ ---
+            { keywords: ["restoran", "kafe", "adisyon", "pos"], response: "Restoranınız için dokunmatik POS sistemleri, el terminalleri ve mutfak yazıcıları kuruyoruz. Siparişleri hızlandırın, hataları azaltın." },
+            { keywords: ["qr", "menü", "dijital menü"], response: "Temassız QR menü sistemimizle müşterileriniz telefonlarından sipariş verebilir. Menü baskı maliyetinden kurtulun." },
+
+            // --- SOHBET & DİĞER ---
+            { keywords: ["fıkra", "şaka", "komik"], response: "Yapay zeka fıkrası: Bir sunucu diğerine ne demiş? 'Bu aralar çok sıcakladım, sanırım firewall'um bozuldu!' :)" },
+            { keywords: ["hayatın anlamı", "42"], response: "Otostopçunun Galaksi Rehberi'ne göre cevap 42. Ama bence hayatın anlamı, insanlara teknolojiyle yardımcı olmak!" },
+            { keywords: ["hava", "durumu"], response: "Ben sanal bir ortamdayım, burada hava hep 'bulutlu' (Cloud Computing)! :) Dışarıdaki hava için meteorolojiye bakmanızı öneririm." },
+            { keywords: ["aşk", "sevgi"], response: "Benim kalbim yok ama kodlarımda size karşı büyük bir saygı ve hizmet aşkı var!" }
+        ];
+
+        function generateResponse(userMessage) {
+            const lowerMsg = userMessage.toLowerCase();
+            let bestMatch = null;
+            let highestScore = 0;
+
+            // Kelime eşleştirme algoritması (Geliştirilmiş)
+            knowledgeBase.forEach(item => {
+                let score = 0;
+                item.keywords.forEach(keyword => {
+                    // Tam kelime eşleşmesi veya güçlü kapsama kontrolü
+                    if (lowerMsg.includes(keyword)) {
+                        // Anahtar kelime uzunluğuna göre ağırlık ver (daha spesifik kelimeler daha değerli)
+                        score += 1 + (keyword.length * 0.1);
+                    }
+                });
+
+                if (score > highestScore) {
+                    highestScore = score;
+                    bestMatch = item;
+                }
+            });
+
+            if (bestMatch && highestScore > 0.5) { // Eşik değeri
+                return bestMatch.response;
+            } else {
+                // Fallback cevaplar (Çeşitlendirilmiş)
+                const fallbacks = [
+                    "Bu konu hakkında veri tabanımda yeterli bilgi yok, ancak teknik ekibimiz kesinlikle yardımcı olabilir. İletişim numaramızdan arayabilir misiniz?",
+                    "Çok spesifik bir soru! Bunu proje yöneticimize iletmem en doğrusu olur. Lütfen formu doldurun, sizi arayalım.",
+                    "Bunu henüz öğrenmedim ama öğrenmeye hevesliyim! :) Detayları konuşmak için ofisimize bekleriz.",
+                    "Anladım. Bu konuda size en doğru bilgiyi vermek için bir insan meslektaşıma danışmam gerek. Formu doldurursanız size dönüş yapabiliriz.",
+                    "Hmm, bu konuda emin değilim. Ama web tasarım, güvenlik veya sunucu sistemleri hakkında sorarsanız bülbül gibi şakırım!"
+                ];
+                return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+            }
+        }
+    </script>
+
+</body>
+
+</html>

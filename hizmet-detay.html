@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Hizmet Detayı | System</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+</head>
+
+<body class="hacker-theme">
+
+    <header>
+        <div class="container">
+            <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
+                        class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#services">/HİZMETLER</a></li>
+                    <li><a href="teklif.html">/TEKLİF_İSTE</a></li>
+                    <li><a href="iletisim.html">/İLETİŞİM</a></li>
+                    <li><a href="hakkimizda.html" class="active">/HAKKIMIZDA</a></li>
+                    <li><a href="admin.html">/YÖNETİM</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="detail-hero">
+        <div class="container">
+            <h1 id="page-title" class="glitch-text">YÜKLENİYOR...</h1>
+            <p id="page-desc" class="service-desc">Veri çekiliyor...</p>
+
+            <div class="service-list-container">
+                <h3>> YETENEKLER:</h3>
+                <ul id="feature-list" class="terminal-list">
+                </ul>
+            </div>
+
+            <div class="cta-box">
+                <p>Bu sistem için yapılandırma gerekiyor.</p>
+                <a href="teklif.html" class="cyber-btn">>> TEKLİF AL </a>
+                <br><br>
+                <a href="tel:+905491679067" class="phone-link">ARA: 0549 167 9067</a>
+                <br>
+                <a href="mailto:yagizongun8@gmail.com" class="mail-link">MAİL: yagizongun8@gmail.com</a>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+
+    <script>
+        const services = {
+            'guvenlik': {
+                title: 'GÜVENLİK & ALARM PROTOKOLLERİ',
+                desc: 'Mekan güvenliğinizi son teknoloji IP kameralar ve akıllı alarm sistemleri ile sağlıyoruz. İzinsiz girişleri tespit eden yapay zeka destekli çözümler.',
+                features: ['IP Kamera Montajı', 'Hırsız Alarm Sistemleri', 'Restoran Menü Sistemleri', 'Hareket Sensörleri']
+            },
+            'bilisim': {
+                title: 'SUNUCU & DONANIM ALTYAPISI',
+                desc: 'Şirketiniz için yüksek performanslı sunucular kuruyor, bilgisayar toplama ve ağ altyapı hizmetleri veriyoruz.',
+                features: ['Windows/Linux Sunucu Kurulumu', 'PC Toplama & Donanım', 'Ağ (Network) Kablolama', 'Sistem Odası Tasarımı']
+            },
+            'web': {
+                title: 'WEB GELİŞTİRME & HOSTING',
+                desc: 'Dijital varlığınızı oluşturuyoruz. Hızlı, güvenli hosting ve modern web tasarımları.',
+                features: ['Kurumsal Web Sitesi', 'E-Ticaret Altyapısı', 'SSL & Hosting Hizmeti', 'SEO Optimizasyonu']
+            },
+            'enerji': {
+                title: 'ENERJİ SİSTEMLERİ & GÜNEŞ PANELİ',
+                desc: 'Yenilenebilir enerji çözümleri ile işletmenizin enerji maliyetlerini düşürüyoruz.',
+                features: ['Güneş Paneli Montajı', 'Inverter Kurulumu', 'Enerji Depolama', 'Bakım & Onarım']
+            }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const cat = urlParams.get('cat');
+
+        const data = services[cat] || { title: '404 - MODÜL YOK', desc: 'Böyle bir hizmet tanımlı değil.', features: [] };
+
+        document.getElementById('page-title').innerText = data.title;
+        document.getElementById('page-desc').innerText = data.desc;
+
+        const listContainer = document.getElementById('feature-list');
+        data.features.forEach(item => {
+            let li = document.createElement('li');
+            li.innerHTML = `<i class="fa-solid fa-check"></i> ${item}`;
+            listContainer.appendChild(li);
+        });
+    </script>
+
+</body>
+
+</html>

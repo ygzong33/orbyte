@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>/FORUM | ORBYTE Haberler</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+    <style>
+        /* Forum card expanded behavior */
+        .service-card {
+            transition: all 0.3s ease;
+            color: #ddd;
+        }
+
+        .service-card .full-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+        }
+
+        .service-card.expanded {
+            flex-direction: column !important;
+            align-items: center;
+        }
+
+        .service-card.expanded img {
+            width: 80% !important;
+            height: auto !important;
+            margin: 0 auto !important;
+            display: block !important;
+            border-radius: 6px;
+        }
+
+        .service-card.expanded .full-content>div {
+            text-align: center;
+            margin: 12px 0;
+        }
+
+        .service-card.expanded .news-title {
+            text-align: center;
+            width: 100%;
+        }
+
+        .service-card .toggle-news {
+            background: none;
+            border: none;
+            color: var(--neon-green);
+            cursor: pointer;
+            padding: 0;
+            margin-top: 6px;
+            text-align: left;
+        }
+
+        .service-card.expanded .toggle-news {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body class="hacker-theme">
+
+    <header>
+        <div class="container">
+            <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
+                        class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#services">/HİZMETLER</a></li>
+                    <li><a href="teklif.html">/TEKLİF_İSTE</a></li>
+                    <li><a href="iletisim.html">/İLETİŞİM</a></li>
+                    <li><a href="hakkimizda.html">/HAKKIMIZDA</a></li>
+                    <li><a href="admin.html">/YÖNETİM</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1 style="text-align:center; margin:40px 20px 40px 20px; font-size:2rem;">/FORUM - GÜNCEL TEKNOLOJİ HABERLERİ
+        </h1>
+
+        <div class="container" style="padding:20px;">
+            <div id="newsList"
+                style="display: grid; grid-template-columns: 1000px; justify-content:center; gap: 30px; margin:0 auto; padding-bottom:20px;">
+                <p style="color:#666; text-align:center; grid-column: 1/-1;">Yükleniyor...</p>
+            </div>
+            <div id="noNewsMsg" style="display:none; text-align:center; padding:20px; color:#555; grid-column: 1/-1;">
+                &gt;_ Henüz haber yok. Yönetici panelinden eklenmesini bekleyin.
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+        function formatParagraphs(text) {
+            if (!text) return '';
+            text = String(text).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+            const parts = text.split(/\n\s*\n/);
+            return parts.map(p => '<p class="news-paragraph" style="margin:6px 0; color:#ddd; text-align:left;">' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>').join('');
+        }
+        function renderNews() {
+            const data = JSON.parse(localStorage.getItem('haberler')) || [];
+            const container = document.getElementById('newsList');
+            const noNews = document.getElementById('noNewsMsg');
+            container.innerHTML = '';
+            if (data.length === 0) {
+                noNews.style.display = 'block';
+                return;
+            }
+            noNews.style.display = 'none';
+            // Show newest first
+            data.slice().reverse().forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'service-card';
+                // Fixed size 1000x200px as requested
+                card.style.width = '1000px';
+                card.style.boxSizing = 'border-box';
+                card.style.padding = '12px';
+                card.style.background = '#0b0b0b';
+                card.style.border = '1px solid rgba(15,255,15,0.08)';
+                card.style.borderRadius = '6px';
+                card.style.overflow = 'hidden';
+                card.style.display = 'flex';
+
+                const contentHtml = formatParagraphs(item.content || '');
+                const summaryHtml = escapeHtml(item.summary || '');
+
+                // Build content with a toggle button and a hidden full-content div that expands downward
+                if (item.image) {
+                    card.style.flexDirection = 'row';
+                    card.innerHTML = `
+                        <div style="flex:0 0 300px; height:176px; overflow:hidden; border-radius:4px;">
+                            <img src="${item.image}" alt="haber görseli" style="width:100%; height:100%; object-fit:cover; display:block;">
+                        </div>
+                        <div style="flex:1; padding-left:12px; display:flex; flex-direction:column;">
+                            <h3 class="news-title" style="margin:0 0 6px 0; font-size:1.05rem; cursor:pointer;">${item.title}</h3>
+                            <div style="font-size:0.78rem; color:#999; margin-bottom:6px;">${item.tarih}</div>
+                            <p style="margin:0 0 8px 0; color:#ddd;">${summaryHtml}</p>
+                            <button class="toggle-news" style="background:none;border:none;color:var(--neon-green);cursor:pointer;padding:0;margin-top:6px; text-align:left;">HABERİ OKU</button>
+                            <div class="full-content" style="max-height:0; overflow:hidden; transition:max-height 0.3s ease;">
+                                <div style="margin-top:8px; font-size:0.9rem; max-height:150px; overflow-y:auto;">${contentHtml}</div>
+                                <div style="text-align:center; margin-top:10px;">
+                                    <button class="close-news" style="background:none;border:1px solid red;color:red;padding:6px 12px;cursor:pointer;display:none;">HABERİ KAPAT</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    card.style.flexDirection = 'column';
+                    card.innerHTML = `
+                        <h3 class="news-title" style="margin:0 0 6px 0; font-size:1.05rem; cursor:pointer;">${item.title}</h3>
+                        <div style="font-size:0.78rem; color:#999; margin-bottom:6px;">${item.tarih}</div>
+                        <p style="margin:0 0 8px 0; color:#ddd;">${summaryHtml}</p>
+                        <button class="toggle-news" style="background:none;border:none;color:var(--neon-green);cursor:pointer;padding:0;margin-top:6px;text-align:left;">HABERİ OKU</button>
+                        <div class="full-content" style="max-height:0; overflow:hidden; transition:max-height 0.3s ease;">
+                            <div style="margin-top:8px; font-size:0.9rem; max-height:150px; overflow-y:auto;">${contentHtml}</div>
+                            <div style="text-align:center; margin-top:10px;">
+                                <button class="close-news" style="background:none;border:1px solid red;color:red;padding:6px 12px;cursor:pointer;display:none;">HABERİ KAPAT</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(card);
+
+                // Attach toggle behavior: clicking the button or title toggles vertical expansion
+                const toggleBtn = card.querySelector('.toggle-news');
+                const closeBtn = card.querySelector('.close-news');
+                const full = card.querySelector('.full-content');
+                const titleEl = card.querySelector('.news-title');
+                const doToggle = () => {
+                    if (!full) return;
+                    const isExpanded = card.classList.contains('expanded');
+                    if (isExpanded) {
+                        // collapse
+                        card.classList.remove('expanded');
+                        full.style.maxHeight = '0';
+                        if (toggleBtn) { toggleBtn.style.display = 'inline-block'; toggleBtn.textContent = 'HABERİ OKU'; }
+                        if (closeBtn) closeBtn.style.display = 'none';
+                    } else {
+                        // expand vertically: change layout then open content
+                        card.classList.add('expanded');
+                        // give browser a moment to apply styles (image resize), then set maxHeight
+                        setTimeout(() => {
+                            try {
+                                full.style.maxHeight = full.scrollHeight + 'px';
+                            } catch (e) {
+                                full.style.maxHeight = '500px';
+                            }
+                        }, 50);
+                        if (toggleBtn) toggleBtn.style.display = 'none';
+                        if (closeBtn) { closeBtn.style.display = 'inline-block'; }
+                    }
+                };
+                if (toggleBtn) toggleBtn.addEventListener('click', doToggle);
+                if (titleEl) titleEl.addEventListener('click', doToggle);
+                if (closeBtn) closeBtn.addEventListener('click', doToggle);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderNews();
+        });
+    </script>
+
+</body>
+
+</html>
