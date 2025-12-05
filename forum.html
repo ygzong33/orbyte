@@ -206,7 +206,17 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            renderNews();
+            // Add small delay for file:// protocol localStorage access
+            setTimeout(renderNews, 100);
+        });
+
+        // Fallback: also try on window.onload
+        window.addEventListener('load', () => {
+            // Only render if container is still showing "Yükleniyor..."
+            const container = document.getElementById('newsList');
+            if (container && container.innerHTML.includes('Yükleniyor')) {
+                renderNews();
+            }
         });
     </script>
 
