@@ -3,1009 +3,355 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Sistem Yönetim Ekranı</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
-    <!-- SheetJS için Excel dosyası desteği -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <style>
-        /* Admin Paneline Özel Ekstra Stiller */
-        .login-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .admin-container {
-            display: none;
-            padding: 50px 0;
-        }
-
-        .control-group {
-            background: #111;
-            border: 1px solid var(--neon-green);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .status-badge {
-            background: var(--neon-green);
-            color: #000;
-            padding: 2px 8px;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-
-        /* EXCEL İNDİR butonu hover kırmızı */
-        .cyber-btn.excel-download {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-        }
-
-        .cyber-btn.excel-download:hover {
-            color: red !important;
-            border-color: red !important;
-        }
-
-        /* Collapsible control groups */
-        .control-group>h3 {
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .control-group>h3::after {
-            content: '\25BC';
-            float: right;
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        .control-group>h3.active::after {
-            content: '\25B2';
-        }
-
-        .collapsible-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.35s ease, padding 0.25s ease;
-            margin-top: 0;
-            padding-top: 0;
-            padding-bottom: 0;
-        }
-
-        .control-group>h3.active+.collapsible-content {
-            /* when header is active, allow some top margin/padding */
-            margin-top: 12px;
-            padding-top: 12px;
-            padding-bottom: 8px;
-        }
-
-        /* Offer table and controls styling */
-        .offer-controls {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-top: 10px;
-            justify-content: center;
-        }
-
-        .offer-controls #offerSearch {
-            min-width: 320px;
-            max-width: 60%;
-        }
-
-        .offer-table-wrapper {
-            overflow-x: auto;
-            padding-top: 8px;
-            max-width: 1450px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        .offer-table {
-            width: 100%;
-            text-align: left;
-            border-collapse: collapse;
-            color: #fff;
-            font-size: 0.95rem;
-            table-layout: fixed;
-        }
-
-        .offer-table thead th {
-            background: #111;
-            color: var(--neon-green);
-            border-bottom: 2px solid #333;
-            padding: 10px;
-        }
-
-        .offer-table tbody td {
-            padding: 12px 10px;
-            vertical-align: top;
-            word-wrap: break-word;
-            white-space: normal;
-        }
-
-        .offer-table tbody tr {
-            border-bottom: 1px solid #222;
-        }
-
-        .offer-table tbody tr:hover {
-            background: rgba(0, 255, 0, 0.02);
-        }
-
-        .offer-col-checkbox {
-            width: 48px;
-            text-align: center;
-        }
-
-        .offer-col-date {
-            width: 150px;
-            color: #888;
-        }
-
-        .offer-col-customer {
-            width: 240px;
-            font-weight: 600;
-        }
-
-        .offer-col-service {
-            width: 160px;
-            color: var(--neon-green);
-        }
-
-        .offer-col-actions {
-            width: 120px;
-            text-align: center;
-        }
-
-        /* Make control-group inner content spaced */
-        .control-group .collapsible-content>* {
-            margin-bottom: 8px;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ORBYTE // ADMIN V2.0</title>
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/admin.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Courier+New&display=swap"
+        rel="stylesheet">
 </head>
 
-<body class="hacker-theme">
+<body>
 
-    <!-- Site Header (tek bir yerde, body içinde) -->
-    <header>
-        <div class="container">
-            <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
-                        class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
-                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="glitch" data-text="SYSTEM LOCK">SYSTEM_LOCK</div>
+            <p style="color: #888; margin-bottom: 20px;">/// SECURIZED ACCESS PANEL ///</p>
+
+            <form onsubmit="event.preventDefault(); APP.login(this.user.value, this.pass.value);">
+                <input type="text" name="user" class="cyber-input" placeholder="USERNAME"
+                    style="margin-bottom: 10px; text-align: center;">
+                <input type="password" name="pass" class="cyber-input" placeholder="PASSWORD"
+                    style="margin-bottom: 20px; text-align: center;">
+                <button type="submit" class="cyber-btn" style="width: 100%;">[ UNLOCK ]</button>
+            </form>
+            <div style="margin-top:20px; font-size: 0.7rem; color: #444;">
+                IP: <span id="user-ip">DETECTING...</span>
             </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html#services">/HİZMETLER</a></li>
-                    <li><a href="teklif.html">/TEKLİF_İSTE</a></li>
-                    <li><a href="iletisim.html">/İLETİŞİM</a></li>
-                    <li><a href="hakkimizda.html" class="active">/HAKKIMIZDA</a></li>
-                </ul>
+        </div>
+    </div>
+
+    <!-- MAIN APP LAYOUT -->
+    <div id="app" class="admin-layout" style="display: none;">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fas fa-terminal" style="margin-right: 10px;"></i> ORBYTE_OS
+            </div>
+
+            <nav class="nav-links">
+                <a href="#" class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-page="offers">
+                    <i class="fas fa-inbox"></i> Teklifler
+                    <span class="badge" style="position: relative; top:0; right:0; margin-left: auto;">NEW</span>
+                </a>
+                <a href="#" class="nav-item" data-page="news">
+                    <i class="fas fa-newspaper"></i> Haberler
+                </a>
+                <a href="#" class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i> Kullanıcılar
+                </a>
+                <a href="#" class="nav-item" data-page="logs">
+                    <i class="fas fa-history"></i> Loglar
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i> Ayarlar
+                </a>
             </nav>
-        </div>
-    </header>
 
-    <div id="loginScreen" class="login-overlay">
-        <h1 class="glitch-text" style="font-size: 3rem;">SİSTEM KİLİTLİ LÜTFEN GİRİŞ YAPIN </h1>
-        <p>Lütfen Kullanıcı Adı ve Parolasını Girin</p>
-        <br>
-        <input type="text" id="adminUser" class="terminal-input" style="width: 200px; text-align: center;"
-            placeholder="KULLANICI_ADI" autocomplete="off">
-        <br>
-        <input type="password" id="adminPass" class="terminal-input" style="width: 200px; text-align: center;"
-            placeholder="PASSWORD" onpaste="return false" oncopy="return false" oncut="return false"
-            oncontextmenu="return false">
-        <br>
-        <button onclick="checkAccess()" class="cyber-btn">[ ERİŞİM İSTE ]</button>
-        <p id="accessMsg" style="color: red; margin-top: 10px;"></p>
-    </div>
-
-    <div id="adminPanel" class="admin-container container">
-
-
-        <hr style="border-color: #333; margin: 20px 0;">
-
-        <div class="control-group">
-            <h3><i class="fa-solid fa-bullhorn"></i> ANA SAYFA DUYURUSU</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Hero bölümündeki alt metni değiştirir.</p>
-                <br>
-                <input type="text" id="duyuruInput" class="terminal-input"
-                    placeholder="Örn: Kamera Montajı | Sunucu | Web">
-                <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-                    <button onclick="saveSetting('siteDuyuru', 'duyuruInput')" class="cyber-btn">[ GÜNCELLE ]</button>
-                    <button onclick="previewDuyuru()" class="cyber-btn" style="border-color:#666; color:#ccc;">[ ÖNİZLE
-                        ]</button>
-                    <button onclick="resetDuyuru()" class="cyber-btn" style="border-color:red; color:red;">[ SIFIRLA
-                        ]</button>
+            <div class="user-profile">
+                <div class="user-avatar"><i class="fas fa-user-astronaut"></i></div>
+                <div style="flex: 1;">
+                    <div id="profile-name" style="font-weight: 600; font-size: 0.9rem;">Admin</div>
+                    <div id="profile-role" style="font-size: 0.7rem; color: #888;">System OP</div>
                 </div>
+                <button id="btnLogout" style="background: none; border: none; color: #888; cursor: pointer;"><i
+                        class="fas fa-sign-out-alt"></i></button>
             </div>
-        </div>
+        </aside>
 
-        <div class="control-group">
-            <h3><i class="fa-solid fa-phone"></i> SİSTEM TELEFONU</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Sitedeki tüm 'Ara' butonlarını günceller.</p>
-                <br>
-                <input type="text" id="phoneInput" class="terminal-input" placeholder="+905491679067">
-                <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-                    <button onclick="saveSetting('sitePhone', 'phoneInput')" class="cyber-btn">[ NUMARAYI GÜNCELLE
-                        ]</button>
-                    <button onclick="applyPhoneToLinks()" class="cyber-btn" style="border-color:#666; color:#ccc;">[
-                        UYGULA ]</button>
-                </div>
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <div class="search-bar">
+                <i class="fas fa-search" style="color: #666; margin-right: 10px;"></i>
+                <input type="text" placeholder="Komut veya arama (CTRL+K)...">
             </div>
-        </div>
 
-        <div class="control-group">
-            <h3><i class="fa-solid fa-power-off"></i> SİTE BAKIM MODU</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Siteyi kilitler (Şu an simülasyon).</p>
-                <br>
-                <label style="cursor:pointer;">
-                    <input type="checkbox" id="bakimMode"> BAKIM_MODU_AKTİF
-                </label>
-                <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
-                    <button onclick="saveBakimMode()" class="cyber-btn">[ DURUMU KAYDET ]</button>
-                    <button onclick="clearBakimMode()" class="cyber-btn" style="border-color:#666; color:#ccc;">[
-                        SIFIRLA ]</button>
-                </div>
+            <div class="header-actions">
+                <span id="sys-time" style="font-family: monospace; color: var(--primary-color);">12:00:00</span>
+                <button class="action-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+                <button class="action-btn"><i class="fas fa-envelope"></i></button>
             </div>
-        </div>
+        </header>
 
-        <div class="control-group">
-            <h3><i class="fa-solid fa-comments"></i> FORUM / HABER YÖNETİMİ</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Buradan site için teknoloji haberleri ve duyurular ekleyebilir,
-                    düzenleyebilir veya silebilirsiniz.</p>
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
 
-                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start;">
-                    <input type="text" id="newsTitle" class="terminal-input" placeholder="Başlık"
-                        style="flex:1; min-width:200px;">
-                    <input type="text" id="newsSummary" class="terminal-input" placeholder="Kısa özet (opsiyonel)"
-                        style="flex:1; min-width:200px;">
-                </div>
-                <textarea id="newsContent" class="terminal-input" placeholder="Haber içeriği"
-                    style="width:100%; height:120px; margin-top:10px;"></textarea>
-                <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
-                    <input type="file" id="newsImage" accept="image/*" style="color:#fff;">
-                    <img id="newsImagePreview" src="" alt=""
-                        style="max-width:160px; max-height:100px; display:none; border-radius:4px; margin-left:8px; object-fit:cover;">
-                </div>
-                <div style="display:flex; gap:10px; margin-top:8px;">
-                    <button onclick="saveNews()" class="cyber-btn">[ YAYINLA ]</button>
-                    <button onclick="clearNewsForm()" class="cyber-btn" style="border-color:#666; color:#999;">[ TEMİZLE
-                        ]</button>
-                    <button onclick="exportNews()" class="cyber-btn" style="border-color:#666; color:#ccc;">[ DIŞA AKTAR
-                        ]</button>
-                </div>
+            <!-- PAGE: DASHBOARD -->
+            <div id="page-dashboard" class="page-section active">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;"><i
+                        class="fas fa-home"></i> SİSTEM ÖZETİ</h2>
 
-                <hr style="border-color:#222; margin:12px 0;">
-                <div id="newsAdminList" style="max-height:300px; overflow:auto;"></div>
-            </div>
-        </div>
-        <hr style="border-color: #333; margin: 30px 0;">
-
-        <div class="control-group">
-            <h3><i class="fa-solid fa-paint-roller"></i> SİTE GÖRÜNÜMÜ & AYARLARI</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Site başlığı, favicon ve ana sayfa bölümlerini buradan yönetin.
-                </p>
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap;">
-                    <input type="text" id="siteTitleInput" class="terminal-input" placeholder="Site başlığı (title)"
-                        style="min-width:240px;">
-                    <button onclick="applySiteTitle()" class="cyber-btn">[ BAŞLIĞI UYGULA ]</button>
-                </div>
-
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                    <input type="file" id="siteFaviconFile" accept="image/*" style="color:#fff;">
-                    <button onclick="document.getElementById('siteFaviconFile').click()" class="cyber-btn">[ FAVICON
-                        YÜKLE ]</button>
-                    <button onclick="clearFavicon()" class="cyber-btn" style="border-color:#666; color:#ccc;">[ FAVICON
-                        SIFIRLA ]</button>
-                </div>
-
-                <div style="display:flex; gap:12px; align-items:center; margin-top:10px;">
-                    <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox" id="toggleHero">
-                        Göster: Hero Bölümü</label>
-                    <label style="display:flex; gap:6px; align-items:center;"><input type="checkbox"
-                            id="toggleServices"> Göster: Hizmetler</label>
-                    <button onclick="saveDisplaySettings()" class="cyber-btn" style="border-color:#666; color:#ccc;">[
-                        AYARLARI KAYDET ]</button>
-                </div>
-            </div>
-        </div>
-
-        <hr style="border-color: #333; margin: 30px 0;">
-
-        <div class="control-group">
-            <h3><i class="fa-solid fa-users"></i> KULLANICI YÖNETİMİ</h3>
-            <div class="collapsible-content">
-                <p style="font-size:0.8rem; color:#666;">Yönetici kullanıcılarını ekleyin, silin veya şifrelerini
-                    değiştirin.</p>
-
-                <h4 style="margin-top:12px; color:#0f0;">[ YENİ KULLANICI EKLE ]</h4>
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                    <input type="text" id="newUserName" class="terminal-input" placeholder="Yeni kullanıcı adı"
-                        style="min-width:180px;">
-                    <input type="password" id="newUserPass" class="terminal-input" placeholder="Parola"
-                        style="min-width:180px;">
-                    <button onclick="addUser()" class="cyber-btn">[ EKLE ]</button>
-                </div>
-
-                <h4 style="margin-top:14px; color:#0f0;">[ ŞİFRE DEĞİŞTİR ]</h4>
-                <div style="display:flex; gap:8px; align-items:center; margin-top:8px;">
-                    <select id="changeUserSelect" class="terminal-input" style="min-width:180px;">
-                        <option value="">Kullanıcı seçin...</option>
-                    </select>
-                    <input type="password" id="changeUserNewPass" class="terminal-input" placeholder="Yeni parola"
-                        style="min-width:180px;">
-                    <button onclick="changeUserPassword()" class="cyber-btn">[ DEĞİŞTİR ]</button>
-                </div>
-
-                <h4 style="margin-top:14px; color:#0f0;">[ KULLANICILAR ]</h4>
-                <div id="usersList" style="margin-top:12px; max-height:300px; overflow:auto;"></div>
-            </div>
-        </div>
-
-        <hr style="border-color: #333; margin: 30px 0;">
-
-        <div class="control-group" style="border-color: var(--neon-green);">
-            <h3><i class="fa-solid fa-database"></i> GELEN TEKLİFLER VERİTABANI</h3>
-            <div class="collapsible-content">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div style="display:flex; gap:10px;">
-                        <button onclick="downloadOffers()" class="cyber-btn excel-download" style="font-size:0.8rem;">[
-                            EXCEL İNDİR ]</button>
-                        <button onclick="clearOffers()" class="cyber-btn"
-                            style="font-size:0.8rem; border-color:red; color:red;">[ VERİLERİ TEMİZLE ]</button>
-                        <button onclick="loadOffers()" class="cyber-btn"
-                            style="font-size:0.8rem; border-color:#666; color:#ccc;">[ YENİLE ]</button>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Toplam Teklif</div>
+                        <div class="stat-value" id="stat-total-offers">0</div>
+                        <div style="font-size: 0.8rem; color: var(--primary-color);">+12% geçen hafta</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Bugün Gelen</div>
+                        <div class="stat-value" id="stat-today-offers">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Sistem Durumu</div>
+                        <div class="stat-value" id="stat-system-status"
+                            style="color: var(--success); font-size: 1.5rem;">ONLINE</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Aktif Ziyaretçi</div>
+                        <div class="stat-value">14</div>
                     </div>
                 </div>
-                <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Site üzerinden gelen son istekler burada
-                    listelenir.</p>
-                <div class="offer-controls">
-                    <input id="offerSearch" class="terminal-input" placeholder="Teklif ara (isim, telefon, hizmet)">
-                    <button onclick="filterOffers()" class="cyber-btn">[ ARA ]</button>
-                    <button onclick="deleteSelectedOffers()" class="cyber-btn" style="border-color:red; color:red;">[
-                        SEÇİLİLERİ SİL ]</button>
-                    <button onclick="exportSelectedOffers()" class="cyber-btn">[ SEÇİLİLERİ DIŞA AKTAR ]</button>
-                    <input type="file" id="importOffersFile" accept="application/json" style="display:none;">
-                    <button onclick="document.getElementById('importOffersFile').click()" class="cyber-btn">[ İÇE AKTAR
-                        ]</button>
+
+                <div class="data-table-wrapper">
+                    <div
+                        style="padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between;">
+                        <span><i class="fas fa-stream"></i> SON AKTİVİTELER</span>
+                        <button class="cyber-btn" style="font-size: 0.7rem;">TÜMÜNÜ GÖR</button>
+                    </div>
+                    <div id="dashboard-activity-list" style="max-height: 250px; overflow-y: auto;">
+                        <!-- Dynamic Logs -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: OFFERS (CRM) -->
+            <div id="page-offers" class="page-section">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
+                    <i class="fas fa-inbox"></i> TEKLİF YÖNETİMİ & CRM
+                </h2>
+
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <input type="text" class="cyber-input" placeholder="Müşteri veya hizmet ara..."
+                        onkeyup="APP.renderOffers(this.value)">
+                    <button class="cyber-btn">DIŞA AKTAR (XLSX)</button>
                 </div>
 
-                <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">Site üzerinden gelen son istekler burada
-                    listelenir.</p>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>MÜŞTERİ</th>
+                                <th>HİZMET</th>
+                                <th>TARİH</th>
+                                <th>DURUM</th>
+                                <th>İŞLEM</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offers-table-body">
+                            <!-- JS Generated Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                <div>
-                    <div class="offer-table-wrapper">
-                        <table class="offer-table">
-                            <thead>
-                                <tr>
-                                    <th class="offer-col-checkbox"><input type="checkbox" id="selectAllOffers"
-                                            onclick="toggleSelectAllOffers(this)"></th>
-                                    <th class="offer-col-date">TARİH</th>
-                                    <th class="offer-col-customer">MÜŞTERİ</th>
-                                    <th class="offer-col-service">HİZMET</th>
-                                    <th>NOT</th>
-                                    <th class="offer-col-actions">İŞLEM</th>
-                                </tr>
-                            </thead>
-                            <tbody id="offerTableBody"></tbody>
-                        </table>
-                        <div id="noDataMsg" style="display:none; text-align:center; padding:20px; color:#555;">
-                            &gt;_ VERİ YOK / SİSTEM BEKLEMEDE...
+            <!-- PAGE: NEWS -->
+            <div id="page-news" class="page-section">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
+                    <i class="fas fa-pen-nib"></i> İÇERİK YÖNETİMİ
+                </h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <!-- Create Form -->
+                    <div class="stat-card">
+                        <h3 style="margin-top: 0; color: var(--primary-color);">YENİ HABER</h3>
+                        <br>
+                        <input type="text" id="news-title" class="cyber-input" placeholder="Başlık"
+                            style="margin-bottom: 10px;">
+                        <textarea id="news-summary" class="cyber-input" placeholder="Özet / İçerik"
+                            style="margin-bottom: 10px; height: 100px;"></textarea>
+                        <button onclick="APP.saveNews()" class="cyber-btn" style="width: 100%;">[ YAYINLA ]</button>
+                    </div>
+
+                    <!-- List -->
+                    <div class="stat-card" style="max-height: 500px; overflow-y: auto;">
+                        <h3 style="margin-top: 0;">YAYINDAKİLER</h3>
+                        <div id="news-list" style="margin-top: 20px;">
+                            <!-- JS List -->
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
+            <!-- PAGE: USERS -->
+            <div id="page-users" class="page-section">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
+                    <i class="fas fa-users"></i> KULLANICI YÖNETİMİ
+                </h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                    <!-- Create Form -->
+                    <div class="stat-card">
+                        <h3 style="margin-top: 0; color: var(--primary-color);">YENİ KULLANICI</h3>
+                        <br>
+                        <input type="text" id="user-name" class="cyber-input" placeholder="Kullanıcı Adı"
+                            style="margin-bottom: 10px;">
+                        <input type="password" id="user-pass" class="cyber-input" placeholder="Parola"
+                            style="margin-bottom: 10px;">
+                        <select id="user-role" class="cyber-input" style="margin-bottom: 10px;"
+                            onchange="APP.updateRoleDescription()">
+                            <optgroup label="ÜST SEVİYE / SYSTEM">
+                                <option value="Root">Root / Super Admin</option>
+                                <option value="SysAdmin">System Admin</option>
+                            </optgroup>
+                            <optgroup label="YÖNETİM & OPERASYON">
+                                <option value="SiteManager">Site Yöneticisi</option>
+                                <option value="OpsManager">Operasyon Sorumlusu</option>
+                                <option value="Support">Destek Ekibi</option>
+                            </optgroup>
+                            <optgroup label="İÇERİK & MEDYA">
+                                <option value="Editor">Editör</option>
+                                <option value="Writer">Yazar</option>
+                                <option value="SEO">SEO Uzmanı</option>
+                            </optgroup>
+                            <optgroup label="FORUM & TOPLULUK">
+                                <option value="Moderator">Forum Moderatörü</option>
+                                <option value="Community">Topluluk Yöneticisi</option>
+                            </optgroup>
+                            <optgroup label="SATIŞ & CRM">
+                                <option value="SalesRep">Satış Temsilcisi</option>
+                                <option value="SalesManager">Satış Yöneticisi</option>
+                            </optgroup>
+                            <optgroup label="SİSTEM & AI">
+                                <option value="AITrainer">AI Eğitmeni</option>
+                                <option value="DataAnalyst">Veri Analisti</option>
+                            </optgroup>
+                            <optgroup label="SINIRLI / ÖZEL">
+                                <option value="Observer">Gözlemci (Read-Only)</option>
+                                <option value="Auditor">Denetçi (Audit)</option>
+                                <option value="Guest">Misafir Paneli</option>
+                            </optgroup>
+                            <optgroup label="ÖZEL AMAÇLI">
+                                <option value="Customer">Müşteri Paneli</option>
+                                <option value="Dealer">Bayi / Partner</option>
+                                <option value="Beta">Beta Tester</option>
+                            </optgroup>
+                        </select>
+                        <p id="role-desc-text"
+                            style="font-size: 0.75rem; color: var(--primary-color); margin-bottom: 20px; font-style: italic;">
+                            > Tüm sistem ayarları, Kullanıcı ve Rol yönetimi, Sistem Silme/Reset.
+                        </p>
+                        <button onclick="APP.addUser()" class="cyber-btn" style="width: 100%;">[ EKLE ]</button>
+                    </div>
+
+                    <!-- List -->
+                    <div class="stat-card">
+                        <h3 style="margin-top: 0;">MEVCUT KULLANICILAR</h3>
+                        <div class="data-table-wrapper" style="margin-top: 20px;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>KULLANICI</th>
+                                        <th>ROL</th>
+                                        <th>SON GİRİŞ</th>
+                                        <th>İŞLEM</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <!-- JS Generated Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: LOGS -->
+            <div id="page-logs" class="page-section">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
+                    <i class="fas fa-microchip"></i> SİSTEM LOGLARI
+                </h2>
+                <div class="stat-card" style="height: 500px; overflow: hidden; display: flex; flex-direction: column;">
+                    <div
+                        style="background: #000; padding: 10px; font-family: monospace; flex: 1; overflow-y: scroll; color: #ccc;">
+                        <div style="color: var(--primary-color);">root@orbyte:~$ tail -f /var/log/syslog</div>
+                        <br>
+                        <div id="full-system-logs">
+                            <!-- Simulation -->
+                            <div>[SYSTEM] Core services started... OK</div>
+                            <div>[AUTH] Database connection... OK</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: SETTINGS -->
+            <div id="page-settings" class="page-section">
+                <h2 style="border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 25px;">
+                    <i class="fas fa-cog"></i> SİSTEM AYARLARI
+                </h2>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div class="stat-card">
+                        <h3>GÖRÜNÜM & TEMA</h3>
+                        <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">Panel renk paletini değiştirin.</p>
+
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="APP.toggleTheme('default')" class="cyber-btn"
+                                style="border-color:#00ff00; color:#00ff00;">CLASSIC (GREEN)</button>
+                            <button onclick="APP.toggleTheme('matrix')" class="cyber-btn"
+                                style="border-color:#20C20E; color:#20C20E; font-family:'Courier New';">MATRIX</button>
+                            <button onclick="APP.toggleTheme('crimson')" class="cyber-btn"
+                                style="border-color:#ff0040; color:#ff0040;">CRIMSON</button>
+                        </div>
+
+                        <h3 style="margin-top: 20px;" data-i18n="lang_title">DİL SEÇİMİ</h3>
+                        <p style="color:#666; font-size:0.8rem; margin-bottom:15px;">Panel dilini değiştirin (Sadece siz
+                            etkilenirsiniz).</p>
+                        <select id="lang-select" class="cyber-input" onchange="APP.setLanguage(this.value)">
+                            <option value="tr">TÜRKÇE (TR)</option>
+                            <option value="en">ENGLISH (EN)</option>
+                            <option value="de">DEUTSCH (DE)</option>
+                            <option value="es">ESPAÑOL (ES)</option>
+                        </select>
+                    </div>
+
+                    <div class="stat-card">
+                        <h3>BAKIM & GÜVENLİK</h3>
+                        <label style="display: flex; align-items: center; gap: 10px; margin-top:10px;">
+                            <input type="checkbox"> SİTE BAKIM MODU (MAINTENANCE)
+                        </label>
+                        <br>
+                        <button onclick="APP.restoreItem('gelenTeklifler', 0)" class="cyber-btn"
+                            style="border-color:#666; color:#888; font-size:0.8rem;">[ DEMO: SON SİLİNENİ GERİ AL
+                            ]</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
     </div>
 
+    <!-- Scripts -->
+    <script src="../js/admin_core.js"></script>
     <script>
-        // Yönetim sayfası fonksiyonları: erişim kontrolü, ayar kaydetme, teklifler tablosu
-
-        // Initialize users storage with root user on first load
-        function initializeUsers() {
-            if (!localStorage.getItem('adminUsers')) {
-                const users = [{ username: 'root', password: '14022006yU+-.' }];
-                localStorage.setItem('adminUsers', JSON.stringify(users));
-            }
-        }
-
-        function getUsers() {
-            try {
-                return JSON.parse(localStorage.getItem('adminUsers') || '[]');
-            } catch (e) {
-                return [{ username: 'root', password: '14022006yU+-.' }];
-            }
-        }
-
-        function checkAccess() {
-            initializeUsers();
-            const user = document.getElementById('adminUser').value.trim();
-            const pass = document.getElementById('adminPass').value;
-            const msg = document.getElementById('accessMsg');
-
-            if (!user || !pass) {
-                msg.innerText = 'Lütfen kullanıcı adı ve parola girin!';
-                return;
-            }
-
-            const users = getUsers();
-            const foundUser = users.find(u => u.username === user && u.password === pass);
-
-            if (foundUser) {
-                msg.style.color = 'var(--neon-green)';
-                msg.innerText = 'ERİŞİM ONAYLANDI. YÜKLENİYOR...';
-                localStorage.setItem('currentUser', user);
-                setTimeout(() => {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('adminPanel').style.display = 'block';
-                    loadOffers(); loadNewsAdmin(); loadUsersList();
-                }, 1000);
-            } else {
-                msg.innerText = 'Kullanıcı adı veya parola hatalı!';
-            }
-        }
-
-        function loadUsersList() {
-            const users = getUsers();
-            const listEl = document.getElementById('usersList');
-            const selectEl = document.getElementById('changeUserSelect');
-            if (!listEl) return;
-            listEl.innerHTML = '';
-            if (selectEl) {
-                selectEl.innerHTML = '<option value="">Kullanıcı seçin...</option>';
-                users.forEach(u => {
-                    const option = document.createElement('option');
-                    option.value = u.username;
-                    option.textContent = u.username;
-                    selectEl.appendChild(option);
-                });
-            }
-            users.forEach((u, idx) => {
-                const div = document.createElement('div');
-                div.style.cssText = 'display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #222; margin-bottom:6px;';
-                div.innerHTML = `
-                    <span style="color:#0f0; font-weight:bold;">${u.username}</span>
-                    ${u.username !== 'root' ? `<button onclick="removeUser('${u.username}')" class="cyber-btn" style="padding:4px 8px; font-size:0.75rem; border-color:red; color:red;">[ SİL ]</button>` : '<span style="color:#999; font-size:0.8rem;">[ ROOT ]</span>'}
-                `;
-                listEl.appendChild(div);
-            });
-        }
-
-        function changeUserPassword() {
-            const username = document.getElementById('changeUserSelect').value.trim();
-            const newPass = document.getElementById('changeUserNewPass').value.trim();
-
-            if (!username) {
-                alert('Lütfen bir kullanıcı seçin!');
-                return;
-            }
-            if (!newPass) {
-                alert('Lütfen yeni parola girin!');
-                return;
-            }
-
-            let users = getUsers();
-            const userIdx = users.findIndex(u => u.username === username);
-            if (userIdx === -1) {
-                alert('Kullanıcı bulunamadı!');
-                return;
-            }
-
-            if (!confirm(`'${username}' kullanıcısının şifresi değiştirilecek. Emin misiniz?`)) return;
-
-            users[userIdx].password = newPass;
-            localStorage.setItem('adminUsers', JSON.stringify(users));
-            alert(`'${username}' kullanıcısının şifresi değiştirildi.`);
-            document.getElementById('changeUserSelect').value = '';
-            document.getElementById('changeUserNewPass').value = '';
-        }
-
-        function addUser() {
-            const username = document.getElementById('newUserName').value.trim();
-            const password = document.getElementById('newUserPass').value.trim();
-
-            if (!username || !password) {
-                alert('Kullanıcı adı ve parola boş olamaz!');
-                return;
-            }
-
-            const users = getUsers();
-            if (users.find(u => u.username === username)) {
-                alert('Bu kullanıcı adı zaten var!');
-                return;
-            }
-
-            users.push({ username, password });
-            localStorage.setItem('adminUsers', JSON.stringify(users));
-            alert(`Kullanıcı '${username}' eklendi.`);
-            document.getElementById('newUserName').value = '';
-            document.getElementById('newUserPass').value = '';
-            loadUsersList();
-        }
-
-        function removeUser(username) {
-            if (username === 'root') {
-                alert('Root kullanıcısı silinemez!');
-                return;
-            }
-            if (!confirm(`'${username}' kullanıcısı silinecek. Emin misiniz?`)) return;
-
-            let users = getUsers();
-            users = users.filter(u => u.username !== username);
-            localStorage.setItem('adminUsers', JSON.stringify(users));
-            alert(`Kullanıcı '${username}' silindi.`);
-            loadUsersList();
-        }
-
-        function saveSetting(key, inputId) {
-            const val = document.getElementById(inputId).value;
-            if (val) {
-                localStorage.setItem(key, val);
-                alert('SİSTEM GÜNCELLENDİ: ' + val);
-            } else {
-                alert('HATA: Boş veri girilemez.');
-            }
-        }
-
-        function loadOffers(filterText) {
-            const data = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
-            const tbody = document.getElementById('offerTableBody');
-            const noData = document.getElementById('noDataMsg');
-            tbody.innerHTML = '';
-
-            let list = data.slice().reverse();
-            if (filterText) {
-                const ft = filterText.toLowerCase();
-                list = list.filter(r => (r.ad || '').toLowerCase().includes(ft) || (r.tel || '').toLowerCase().includes(ft) || (r.hizmet || '').toLowerCase().includes(ft) || (r.not || '').toLowerCase().includes(ft));
-            }
-
-            if (list.length === 0) {
-                noData.style.display = 'block';
-            } else {
-                noData.style.display = 'none';
-                list.forEach((row, i) => {
-                    const originalIndex = data.length - 1 - i;
-                    let tr = document.createElement('tr');
-                    tr.style.borderBottom = "1px solid #222";
-                    tr.innerHTML = `
-                     <td style="padding:10px; text-align:center;"><input type="checkbox" class="offer-select" data-idx="${originalIndex}"></td>
-                     <td style="padding:10px; color:#888;">${row.tarih}</td>
-                     <td style="padding:10px; font-weight:bold;">${row.ad} <br> <span style="font-size:0.8rem; color:#fff;">${row.tel || 'Tel Yok'}</span></td>
-                     <td style="padding:10px; color:var(--neon-green);">${row.hizmet}</td>
-                     <td style="padding:10px; font-style:italic;">${row.not}</td>
-                     <td style="padding:10px; text-align:center;">
-                        <button onclick="deleteOffer(${originalIndex})" style="background:none; border:1px solid red; color:red; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:0.9rem;">Sil</button>
-                     </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        function deleteOffer(index) {
-            let teklifler = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
-            if (index >= 0 && index < teklifler.length) {
-                if (confirm('Bu teklifi silmek istediğinize emin misiniz?')) {
-                    teklifler.splice(index, 1);
-                    localStorage.setItem('gelenTeklifler', JSON.stringify(teklifler));
-                    loadOffers();
-                }
-            }
-        }
-
-        function toggleSelectAllOffers(cb) {
-            document.querySelectorAll('.offer-select').forEach(i => i.checked = cb.checked);
-        }
-
-        function getSelectedOfferIndexes() {
-            const boxes = Array.from(document.querySelectorAll('.offer-select')).filter(b => b.checked);
-            return boxes.map(b => parseInt(b.getAttribute('data-idx'))).filter(n => !isNaN(n));
-        }
-
-        function deleteSelectedOffers() {
-            const idxs = getSelectedOfferIndexes();
-            if (idxs.length === 0) { alert('Önce seçim yapın.'); return; }
-            if (!confirm('Seçili teklifleri kalıcı olarak silmek istiyor musunuz?')) return;
-            let data = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
-            // Remove by sorting descending so indexes remain valid
-            idxs.sort((a, b) => b - a).forEach(i => {
-                if (i >= 0 && i < data.length) data.splice(i, 1);
-            });
-            localStorage.setItem('gelenTeklifler', JSON.stringify(data));
-            document.getElementById('selectAllOffers').checked = false;
-            loadOffers();
-        }
-
-        function exportSelectedOffers() {
-            const idxs = getSelectedOfferIndexes();
-            if (idxs.length === 0) { alert('Önce seçim yapın.'); return; }
-            const data = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
-            const selected = idxs.map(i => data[i]).filter(Boolean);
-            const blob = new Blob([JSON.stringify(selected, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'secilen_teklifler_' + (new Date().toISOString().split('T')[0]) + '.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const importInput = document.getElementById('importOffersFile');
-            if (importInput) {
-                importInput.addEventListener('change', function (e) {
-                    const f = e.target.files[0];
-                    if (!f) return;
-                    const reader = new FileReader();
-                    reader.onload = function (ev) {
-                        try {
-                            const incoming = JSON.parse(ev.target.result);
-                            if (!Array.isArray(incoming)) { alert('Geçersiz dosya formatı. Beklenen: JSON dizi.'); return; }
-                            if (!confirm('İçe aktarılan teklifler mevcut kayda eklenecek. Onaylıyor musunuz?')) return;
-                            const existing = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
-                            const merged = existing.concat(incoming);
-                            localStorage.setItem('gelenTeklifler', JSON.stringify(merged));
-                            loadOffers();
-                            alert('İçe aktarım tamamlandı.');
-                        } catch (err) { alert('İçe aktarım hatası: ' + err.message); }
-                    };
-                    reader.readAsText(f);
-                });
-            }
-        });
-
-        function filterOffers() {
-            const v = document.getElementById('offerSearch') ? document.getElementById('offerSearch').value.trim() : '';
-            loadOffers(v);
-        }
-
-        function clearOffers() {
-            if (confirm("DİKKAT: Tüm teklif kayıtları kalıcı olarak silinecek. Onaylıyor musun?")) {
-                localStorage.removeItem('gelenTeklifler');
-                loadOffers();
-            }
-        }
-
-        // Excel dosyası olarak indirme fonksiyonu
-        function downloadOffers() {
-            const dataStr = localStorage.getItem('gelenTeklifler');
-            const data = dataStr ? JSON.parse(dataStr) : [];
-
-            if (data.length === 0) {
-                alert('İndirecek veri yok!');
-                return;
-            }
-
-            try {
-                // Veriyi Excel formatına dönüştür
-                const excelData = data.map(row => ({
-                    'Tarih': row.tarih || '',
-                    'Ad': row.ad || '',
-                    'Telefon': row.tel || '',
-                    'Hizmet': row.hizmet || '',
-                    'Detay': row.not || ''
-                }));
-
-                // WorkSheet oluştur
-                const worksheet = XLSX.utils.json_to_sheet(excelData);
-
-                // Sütun genişliklerini ayarla
-                worksheet['!cols'] = [
-                    { wch: 15 },  // Tarih
-                    { wch: 18 },  // Ad
-                    { wch: 15 },  // Telefon
-                    { wch: 20 },  // Hizmet
-                    { wch: 35 }   // Detay
-                ];
-
-                // Workbook oluştur
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, 'Teklifler');
-
-                // Dosyayı indir
-                const fileName = `Teklif_Kayıtları_${new Date().toISOString().split('T')[0]}.xlsx`;
-                XLSX.writeFile(workbook, fileName);
-            } catch (error) {
-                console.error('Excel indirme hatası:', error);
-                alert('Excel dosyası oluşturulurken hata oluştu: ' + error.message);
-            }
-        }
-
-        // Haber yönetimi fonksiyonları
-        function loadNewsAdmin() {
-            const data = JSON.parse(localStorage.getItem('haberler')) || [];
-            const list = document.getElementById('newsAdminList');
-            list.innerHTML = '';
-            if (data.length === 0) {
-                list.innerHTML = '<div style="color:#666; padding:10px;">Henüz haber yok.</div>';
-                return;
-            }
-            data.slice().reverse().forEach((item, idxRev) => {
-                const idx = data.length - 1 - idxRev;
-                const row = document.createElement('div');
-                row.style.borderBottom = '1px solid #222';
-                row.style.padding = '8px 6px';
-                row.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
-                        ${item.image ? `<img src="${item.image}" style="width:120px; height:80px; object-fit:cover; border-radius:4px; margin-right:10px;">` : ''}
-                        <div style="flex:1">
-                            <strong style="color:var(--neon-green);">${item.title}</strong>
-                            <div style="font-size:0.8rem; color:#999;">${item.tarih}</div>
-                            <div style="font-size:0.9rem; color:#ccc; margin-top:6px;">${item.summary || ''}</div>
-                        </div>
-                        <div style="display:flex; gap:6px; align-items:center;">
-                            <button onclick="editNews(${idx})" class="cyber-btn" style="font-size:0.8rem;">DÜZENLE</button>
-                            <button onclick="deleteNews(${idx})" class="cyber-btn" style="font-size:0.8rem; border-color:red; color:red;">SİL</button>
-                        </div>
-                    </div>
-                `;
-                list.appendChild(row);
-            });
-        }
-
-        function saveNews() {
-            const title = document.getElementById('newsTitle').value.trim();
-            const summary = document.getElementById('newsSummary').value.trim();
-            const content = document.getElementById('newsContent').value.trim();
-            if (!title) { alert('Başlık gerekli.'); return; }
-            const data = JSON.parse(localStorage.getItem('haberler')) || [];
-            const editingIndex = document.getElementById('newsTitle').dataset.editIndex;
-            const now = new Date();
-            const fileInput = document.getElementById('newsImage');
-            const proceedSave = (imageData) => {
-                const item = { id: now.getTime(), tarih: now.toLocaleString(), title, summary, content };
-                if (imageData) item.image = imageData;
-                if (editingIndex !== undefined && editingIndex !== null && editingIndex !== '') {
-                    // keep existing image if not replaced
-                    if (!item.image && data[editingIndex] && data[editingIndex].image) item.image = data[editingIndex].image;
-                    data[editingIndex] = Object.assign({}, data[editingIndex], item);
-                    delete document.getElementById('newsTitle').dataset.editIndex;
-                } else {
-                    data.push(item);
-                }
-                localStorage.setItem('haberler', JSON.stringify(data));
-                clearNewsForm();
-                loadNewsAdmin();
-                try { if (typeof renderNews === 'function') renderNews(); } catch (e) { }
-            };
-
-            if (fileInput && fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    proceedSave(e.target.result);
-                };
-                reader.onerror = function () { proceedSave(null); };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                proceedSave(null);
-            }
-        }
-
-        function clearNewsForm() {
-            document.getElementById('newsTitle').value = '';
-            document.getElementById('newsSummary').value = '';
-            document.getElementById('newsContent').value = '';
-            const img = document.getElementById('newsImagePreview');
-            if (img) { img.src = ''; img.style.display = 'none'; }
-            const fileInput = document.getElementById('newsImage');
-            if (fileInput) fileInput.value = '';
-            delete document.getElementById('newsTitle').dataset.editIndex;
-        }
-
-        function editNews(index) {
-            const data = JSON.parse(localStorage.getItem('haberler')) || [];
-            const item = data[index];
-            if (!item) return;
-            document.getElementById('newsTitle').value = item.title;
-            document.getElementById('newsSummary').value = item.summary || '';
-            document.getElementById('newsContent').value = item.content || '';
-            document.getElementById('newsTitle').dataset.editIndex = index;
-            // show existing image preview if available
-            const img = document.getElementById('newsImagePreview');
-            if (img) {
-                if (item.image) { img.src = item.image; img.style.display = 'block'; }
-                else { img.src = ''; img.style.display = 'none'; }
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteNews(index) {
-            if (!confirm('Bu haberi kalıcı olarak silmek istediğinize emin misiniz?')) return;
-            const data = JSON.parse(localStorage.getItem('haberler')) || [];
-            data.splice(index, 1);
-            localStorage.setItem('haberler', JSON.stringify(data));
-            loadNewsAdmin();
-        }
-
-
-        // Sayfa yük  lendiğinde mevcut ayarları doldur
-        window.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('siteDuyuru')) document.getElementById('duyuruInput').value = localStorage.getItem('siteDuyuru');
-            if (localStorage.getItem('sitePhone')) document.getElementById('phoneInput').value = localStorage.getItem('sitePhone');
-            // Eğer yöne tici zaten giriş yaptıysa (uygulamada simülasyon) paneli göster
-            if (localStorage.getItem('adminUnlocked') === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                loadOffers(); loadNewsAdmin();
-            }
-
-            // Enter tuşu ile giriş yapma desteği
-            const adminInput = document.getElementById('adminPass');
-            if (adminInput) {
-                // Enter ile giriş
-                adminInput.addEventListener('keydown', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        checkAccess();
-                    }
-                });
-
-                // Yapıştırma, kopyalama ve kesme olaylarını engelle
-                adminInput.addEventListener('paste', function (e) { e.preventDefault(); });
-                adminInput.addEventListener('copy', function (e) { e.preventDefault(); });
-                adminInput.addEventListener('cut', function (e) { e.preventDefault(); });
-                adminInput.addEventListener('contextmenu', function (e) { e.preventDefault(); });
-
-                // Klavye kı  sayollarını engelle (Ctrl/Cmd+V, Ctrl/Cmd+C, Insert yapıştırma)
-                adminInput.addEventListener('keydown', function (e) {
-                    const key = e.key || '';
-                    const ctrlOrCmd = e.ctrlKey || e.metaKey;
-                    if (ctrlOrCmd && (key.toLowerCase() === 'v' || key === 'Insert')) {
-                        e.preventDefault();
-                    }
-                    if (ctrlOrCmd && key.toLowerCase() === 'c') {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            // Yönetim p   aneli bölümlerini açılır/kapanır yap
-            document.querySelectorAll('.control-group > h3').forEach(header => {
-                // restore v   isibility if saved (optional)
-                const content = header.nextElementSibling;
-                // initializ        e: keep collapsed
-                if (content && content.classList && content.classList.contains('collapsible-content')) {
-                    content.style.maxHeight = '0';
-                }
-                header.addEventListener('click', () => {
-                    const parent = header.parentElement;
-                    if (parent && parent.classList && parent.classList.contains('no-collapse')) return;
-                    const content = header.nextElementSibling;
-                    if (!(content && content.classList.contains('collapsible-content'))) return;
-
-                    const isActive = header.classList.contains('active');
-
-                    // Close all     other open sections (accordion behavior)
-                    document.querySelectorAll('.control-group > h3.active').forEach(h => {
-                        if (h === header) return;
-                        h.classList.remove('active');
-                        const c = h.nextElementSibling;
-                        if (c && c.classList && c.classList.contains('collapsible-content')) c.style.maxHeight = '0';
-                    });
-
-                    // Toggle clicked one
-                    if (!isActive) {
-                        header.classList.add('active');
-                        content.style.maxHeight = content.scrollHeight + 24 + 'px';
-                    } else {
-                        header.classList.remove('active');
-                        content.style.maxHeight = '0';
-                    }
-                });
-            });
-
-            // Yönetim a raçları: ek fonksiyonlar
-            window.previNewDuyuru = function () {
-                const val = document.getElementById('duyuruInput').value;
-                if (!val) { alert('Önizleme için bir metin girin.'); return; }
-                localStorage.setItem('siteDuyuru', val);
-                // Açık olan index sayfası yoksa yeni sekmede aç
-                window.open('index.html', '_blank');
-            };
-
-            window.resetDuyuru = function () {
-                if (!confirm('Duyuru sıfırlansın mı?')) return;
-                localStorage.removeItem('siteDuyuru');
-                document.getElementById('duyuruInput').value = '';
-                alert('Duyuru sıfırlandı.');
-            };
-
-            window.applyPhoneToLinks = function () {
-                const val = document.getElementById('phoneInput').value;
-                if (!val) { alert('Öncelikle telefon numarası girin.'); return; }
-                localStorage.setItem('sitePhone', val);
-                alert('Numara kaydedildi. Diğer sayfalarda görüntülenmesi için sayfaları yeniden yükleyin.');
-            };
-
-            window.saveBakimMode = function () {
-                const checked = !!document.getElementById('bakimMode').checked;
-                localStorage.setItem('siteBakim', checked ? 'true' : 'false');
-                alert('Bakımmodu kaydedildi: ' + (checked ? 'AKTİF' : 'PASİF'));
-            };
-
-            window.clearBakimMode = function () {
-                localStorage.removeItem('siteBakim');
-                document.getElementById('bakimMode').checked = false;
-                alert('Bakım modu temizlendi.');
-            };
-
-            window.exportNews = function () {
-                const data = JSON.parse(localStorage.getItem('haberler')) || [];
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'haberler_export_' + (new Date().toISOString().split('T')[0]) + '.json';
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                URL.revokeObjectURL(url);
-            };
-
-            // Site appearance handlers
-            const favInputControl = document.getElementById('siteFaviconFile');
-            if (favInputControl) {
-                favInputControl.addEventListener('change', function (e) {
-                    const f = e.target.files[0];
-                    if (!f) return;
-                    const reader = new FileReader();
-                    reader.onload = function (ev) {
-                        try {
-                            localStorage.setItem('siteFavicon', ev.target.result);
-                            alert('Favicon kaydedildi. Değişikliği görmek için sayfayı yenileyin.');
-                        } catch (err) { alert('Favicon kaydedilemedi: ' + err.message); }
-                    };
-                    reader.readAsDataURL(f);
-                });
-            }
-
-            window.applySiteTitle = function () {
-                const val = document.getElementById('siteTitleInput').value.trim();
-                if (!val) { alert('Lütfen site başlığı girin.'); return; }
-                document.title = val;
-                localStorage.setItem('siteTitle', val);
-                alert('Sitebaşlığı kaydedildi.');
-            };
-
-            window.clearFavicon = function () {
-                if (!confirm('Favicon sıfırlansın mı?')) return;
-                localStorage.removeItem('siteFavicon');
-                alert('Favicon temizlendi.');
-            };
-
-            window.saveDisplaySettings = function () {
-                const showHero = !!document.getElementById('toggleHero').checked;
-                const showServices = !!document.getElementById('toggleServices').checked;
-                localStorage.setItem('showHero', showHero ? 'true' : 'false');
-                localStorage.setItem('showServices', showServices ? 'true' : 'false');
-                alert('Görün üm ayarları kaydedildi.');
-            };
-
-            // initializ     e appearance controls
-            try {
-                const st = localStorage.getItem('siteTitle');
-                if (st) document.getElementById('siteTitleInput').value = st;
-                const sh = localStorage.getItem('showHero');
-                if (sh !== null) document.getElementById('toggleHero').checked = sh === 'true'; else document.getElementById('toggleHero').checked = true;
-                const ss = localStorage.getItem('showServices');
-                if (ss !== null) document.getElementById('toggleServices').checked = ss === 'true'; else document.getElementById('toggleServices').checked = true;
-            } catch (e) { }
-        });
+        // Inline init if needed default runs via admin_core.js
+        // Additional FX
+        setTimeout(() => {
+            document.getElementById('user-ip').innerText = '192.168.1.1 (LOCAL)';
+        }, 2000);
     </script>
-
 </body>
 
 </html>

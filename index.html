@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Mimarı | Teknoloji & Kurulum</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+    <link rel="icon" type="image/png" href="../img/orbyte_favicom.png">
 </head>
 
 <body class="hacker-theme">
@@ -17,19 +17,29 @@
             <div class="logo">
                 <a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
                         class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
-                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/Forum</a>
             </div>
-            
+
 
             <nav>
                 <ul>
-                    <li><a href="index.html#services">/HİZMETLER</a></li>
-                    <li><a href="teklif.html">/TEKLİF_İSTE</a></li>
-                    <li><a href="iletisim.html">/İLETİŞİM</a></li>
-                    <li><a href="hakkimizda.html" class="active">/HAKKIMIZDA</a></li>
-                    <li><a href="admin.html">/YÖNETİM</a></li>
+                    <li><a href="index.html#services" data-i18n="nav_services">/HİZMETLER</a></li>
+                    <li><a href="teklif.html" data-i18n="nav_offer">/TEKLİF_İSTE</a></li>
+                    <li><a href="iletisim.html" data-i18n="nav_contact">/İLETİŞİM</a></li>
+                    <li><a href="hakkimizda.html" class="active" data-i18n="nav_about">/HAKKIMIZDA</a></li>
+                    <li><a href="admin.html" data-i18n="nav_admin">/YÖNETİM</a></li>
                 </ul>
             </nav>
+
+            <div class="lang-switcher" style="margin-left: 20px;">
+                <select id="public-lang-select" onchange="APP_PUBLIC.setLanguage(this.value)"
+                    style="background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 5px; font-family: 'Courier New', monospace; cursor: pointer;">
+                    <option value="tr" style="background:#000;">TR</option>
+                    <option value="en" style="background:#000;">EN</option>
+                    <option value="de" style="background:#000;">DE</option>
+                    <option value="es" style="background:#000;">ES</option>
+                </select>
+            </div>
 
 
         </div>
@@ -38,54 +48,54 @@
     <section class="hero-section">
         <div class="overlay"></div>
         <div class="hero-content">
-            <h1 class="glitch-text">DİJİTAL VE FİZİKSEL ÇÖZÜMLER</h1>
-            <p class="typing-effect">Kamera Montajı | Sunucu | Web | Güvenlik | Enerji</p>
+            <h1 class="glitch-text" data-i18n="hero_title">DİJİTAL VE FİZİKSEL ÇÖZÜMLER</h1>
+            <p class="typing-effect" data-i18n="hero_subtitle">Kamera Montajı | Sunucu | Web | Güvenlik | Enerji</p>
             <br>
-            <a href="teklif.html" class="cyber-btn">>> PROJE TEKLİFİ AL </a>
+            <a href="teklif.html" class="cyber-btn" data-i18n="hero_btn">>> PROJE TEKLİFİ AL </a>
         </div>
     </section>
 
     <section id="services" class="services-overview">
         <div>
-            <h2 class="section-title">/SİSTEM_MODÜLLERİ</h2>
+            <h2 class="section-title" data-i18n="sec_modules">/SİSTEM_MODÜLLERİ</h2>
             <div class="grid-container">
 
                 <div class="service-card" onclick="location.href='hizmet-detay.html?cat=guvenlik'">
                     <div class="icon-box"><i class="fa-solid fa-camera"></i></div>
-                    <h3>GÜVENLİK & RESTORAN</h3>
+                    <h3 data-i18n="srv_security_title">GÜVENLİK & RESTORAN</h3>
                     <ul>
-                        <li>Kamera Montajı</li>
-                        <li>Alarm Sistemleri</li>
-                        <li>Restoran Menü Sistemleri</li>
+                        <li data-i18n="srv_security_1">Kamera Montajı</li>
+                        <li data-i18n="srv_security_2">Alarm Sistemleri</li>
+                        <li data-i18n="srv_security_3">Restoran Menü Sistemleri</li>
                     </ul>
                 </div>
 
                 <div class="service-card" onclick="location.href='hizmet-detay.html?cat=bilisim'">
                     <div class="icon-box"><i class="fa-solid fa-server"></i></div>
-                    <h3>SUNUCU & SİSTEM</h3>
+                    <h3 data-i18n="srv_server_title">SUNUCU & SİSTEM</h3>
                     <ul>
-                        <li>Sunucu Kurulumu</li>
-                        <li>Bilgisayar Toplama</li>
-                        <li>Ağ Altyapısı</li>
+                        <li data-i18n="srv_server_1">Sunucu Kurulumu</li>
+                        <li data-i18n="srv_server_2">Bilgisayar Toplama</li>
+                        <li data-i18n="srv_server_3">Ağ Altyapısı</li>
                     </ul>
                 </div>
 
                 <div class="service-card" onclick="location.href='hizmet-detay.html?cat=web'">
                     <div class="icon-box"><i class="fa-solid fa-code"></i></div>
-                    <h3>WEB & HOSTING</h3>
+                    <h3 data-i18n="srv_web_title">WEB & HOSTING</h3>
                     <ul>
-                        <li>Web Tasarımı</li>
-                        <li>Hosting</li>
-                        <li>E-Ticaret</li>
+                        <li data-i18n="srv_web_1">Web Tasarımı</li>
+                        <li data-i18n="srv_web_2">Hosting</li>
+                        <li data-i18n="srv_web_3">E-Ticaret</li>
                     </ul>
                 </div>
 
                 <div class="service-card" onclick="location.href='hizmet-detay.html?cat=enerji'">
                     <div class="icon-box"><i class="fa-solid fa-solar-panel"></i></div>
-                    <h3>ENERJİ SİSTEMLERİ</h3>
+                    <h3 data-i18n="srv_energy_title">ENERJİ SİSTEMLERİ</h3>
                     <ul>
-                        <li>Güneş Paneli</li>
-                        <li>Enerji Yönetimi</li>
+                        <li data-i18n="srv_energy_1">Güneş Paneli</li>
+                        <li data-i18n="srv_energy_2">Enerji Yönetimi</li>
                     </ul>
                 </div>
 
@@ -99,7 +109,7 @@
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="../js/script.js"></script>
     <script>
         // Eğer admin panelinden bir duyuru kaydedildiyse kullan
         (function () {
@@ -119,7 +129,7 @@
                     document.body.appendChild(overlay);
                 }
                 // Özel favicon (admin tarafından yüklendiyse)
-                var sf = localStorage.getItem('siteFavicon');
+                var sf = localStorage.getItem('siteFavicon'); 5
                 if (sf) {
                     try {
                         var link = document.querySelector('link[rel="icon"]');

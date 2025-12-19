@@ -4,12 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Teklif Modülü | System</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+    <link rel="icon" type="image/png" href="../img/orbyte_favicom.png">
     <style>
         body.teklif-bg {
-            background: url('img/teklif_arkaplan.png') center center/cover no-repeat fixed !important;
+            background: url('../img/teklif_arkaplan.png') center center/cover no-repeat fixed !important;
         }
 
         body.teklif-bg:before {
@@ -39,7 +39,7 @@
         <div class="container">
             <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
                         class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
-                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/Forum</a>
             </div>
             <nav>
                 <ul>
@@ -95,16 +95,15 @@
         </div>
     </section>
 
-    <script src="script.js"></script>
+    <script src="../js/script.js"></script>
 
     <script>
-        function kaydetVeGonder() {
+        async function kaydetVeGonder() {
             // 1. VERİLERİ AL
-            var ad = document.getElementById("adsoyad").value;
-            var tel = document.getElementById("telefon").value; // Telefonu alıyoruz
+            var ad = document.getElementById("adsoyad").value.trim();
+            var tel = document.getElementById("telefon").value.trim();
             var hizmet = document.getElementById("hizmet").value;
-            var not = document.getElementById("mesaj").value;
-            var tarih = new Date().toLocaleString();
+            var not = document.getElementById("mesaj").value.trim();
 
             // 2. BOŞ ALAN KONTROLÜ
             if (ad === "" || tel === "") {
@@ -112,37 +111,45 @@
                 return;
             }
 
-            // 3. VERİTABANI İŞLEMİ (Local Storage - Admin Paneli İçin)
+            // 3. VERİTABANINA KAYDET (API üzerinden)
+            // 3. LOCAL STORAGE'A KAYDET (Admin Paneli İçin)
             try {
-                var mevcutVeri = localStorage.getItem('gelenTeklifler');
-                var teklifler = mevcutVeri ? JSON.parse(mevcutVeri) : [];
-
+                let teklifler = JSON.parse(localStorage.getItem('gelenTeklifler')) || [];
                 teklifler.push({
-                    tarih: tarih,
+                    id: Date.now(),
                     ad: ad,
-                    tel: tel, // Telefonu da kaydediyoruz
+                    tel: tel,
                     hizmet: hizmet,
-                    not: not
+                    not: not,
+                    tarih: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString(),
+                    status: 'new'
                 });
-
                 localStorage.setItem('gelenTeklifler', JSON.stringify(teklifler));
-
-                // Başarılı uyarısı
-                alert("BAŞARILI: Teklif alındı! WhatsApp yönlendirmesi yapılıyor...");
-
-            } catch (error) {
-                alert("Kayıt hatası: " + error);
+            } catch (e) {
+                console.error('Local Storage hatası:', e);
             }
 
+            // 4. VERİTABANINA KAYDET (API) - Opsiyonel
+            // Eğer PHP çalışmıyorsa hata vermesini yoksayarak devam ediyoruz
+            try {
+                fetch('../php/api_teklifler.php?action=create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ad, tel, hizmet, not })
+                }).catch(err => console.log('API Erişilemedi (Normal eğer sunucu yoksa)'));
+            } catch (error) { }
+
+            alert("BAŞARILI: Teklifiniz alındı! En kısa sürede iletişime geçeceğiz.");
+
             // 4. WHATSAPP YÖNLENDİRMESİ
-            // BURAYA KENDİ NUMARANI YAZ (Başında 90 olsun, + koyma)
             var myPhone = "905491679067";
+            var tarih = new Date().toLocaleString();
 
             var text = "*YENİ TEKLİF TALEBİ* %0A" +
                 "-------------------%0A" +
                 "*Tarih:* " + tarih + "%0A" +
                 "*Müşteri:* " + ad + "%0A" +
-                "*Tel:* " + tel + "%0A" +  // Telefon mesajda da görünecek
+                "*Tel:* " + tel + "%0A" +
                 "*Hizmet:* " + hizmet + "%0A" +
                 "*Not:* " + not;
 

@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>/FORUM | ORBYTE Haberler</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="icon" type="image/png" href="img/orbyte_favicom.png">
+    <link rel="icon" type="image/png" href="../img/orbyte_favicom.png">
     <style>
         /* Forum card expanded behavior */
         .service-card {
@@ -65,7 +65,7 @@
         <div class="container">
             <div class="logo"><a href="index.html" style="color: var(--neon-green); text-decoration: none;"><span
                         class="terminal-prefix">>_</span> ORBYTE</a> <a href="forum.html" class="forum-badge"
-                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/FORUM</a>
+                    style="margin-left:10px; font-size:0.9rem; color:var(--neon-green); font-weight:600; text-decoration:none;">/Forum</a>
             </div>
             <nav>
                 <ul>
@@ -105,37 +105,60 @@
             const parts = text.split(/\n\s*\n/);
             return parts.map(p => '<p class="news-paragraph" style="margin:6px 0; color:#ddd; text-align:left;">' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>').join('');
         }
-        function renderNews() {
-            const data = JSON.parse(localStorage.getItem('haberler')) || [];
+        async function renderNews() {
             const container = document.getElementById('newsList');
             const noNews = document.getElementById('noNewsMsg');
-            container.innerHTML = '';
-            if (data.length === 0) {
-                noNews.style.display = 'block';
-                return;
-            }
-            noNews.style.display = 'none';
-            // Show newest first
-            data.slice().reverse().forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'service-card';
-                // Fixed size 1000x200px as requested
-                card.style.width = '1000px';
-                card.style.boxSizing = 'border-box';
-                card.style.padding = '12px';
-                card.style.background = '#0b0b0b';
-                card.style.border = '1px solid rgba(15,255,15,0.08)';
-                card.style.borderRadius = '6px';
-                card.style.overflow = 'hidden';
-                card.style.display = 'flex';
+            container.innerHTML = '<p style="color:#666; text-align:center;">Yükleniyor...</p>';
 
-                const contentHtml = formatParagraphs(item.content || '');
-                const summaryHtml = escapeHtml(item.summary || '');
+            // LOCAL STORAGE FIRST (Demo Modu)
+            let data = [];
+            try {
+                // Öncelik admin panelinin yazdığı local veride
+                const localData = JSON.parse(localStorage.getItem('haberler')) || [];
+                if (localData.length > 0) {
+                    data = localData;
+                } else {
+                    // API Denemesi
+                    try {
+                        const response = await fetch('../php/api_haberler.php?action=list&durum=aktif');
+                        const result = await response.json();
+                        if (result.success && result.data) data = result.data;
+                    } catch (e) { console.log("API yok, local veri de yok."); }
+                }
 
-                // Build content with a toggle button and a hidden full-content div that expands downward
-                if (item.image) {
-                    card.style.flexDirection = 'row';
-                    card.innerHTML = `
+                if (data.length === 0) {
+                    container.innerHTML = '';
+                    noNews.style.display = 'block';
+                    return;
+                }
+
+                // Show newest first (Sorting)
+                data.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)); // Sort by date desc
+
+                container.innerHTML = '';
+                noNews.style.display = 'none';
+
+                // Show newest first (already sorted by API)
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card';
+                    // Fixed size 1000x200px as requested
+                    card.style.width = '1000px';
+                    card.style.boxSizing = 'border-box';
+                    card.style.padding = '12px';
+                    card.style.background = '#0b0b0b';
+                    card.style.border = '1px solid rgba(15,255,15,0.08)';
+                    card.style.borderRadius = '6px';
+                    card.style.overflow = 'hidden';
+                    card.style.display = 'flex';
+
+                    const contentHtml = formatParagraphs(item.content || '');
+                    const summaryHtml = escapeHtml(item.summary || '');
+
+                    // Build content with a toggle button and a hidden full-content div that expands downward
+                    if (item.image) {
+                        card.style.flexDirection = 'row';
+                        card.innerHTML = `
                         <div style="flex:0 0 300px; height:176px; overflow:hidden; border-radius:4px;">
                             <img src="${item.image}" alt="haber görseli" style="width:100%; height:100%; object-fit:cover; display:block;">
                         </div>
@@ -152,9 +175,9 @@
                             </div>
                         </div>
                     `;
-                } else {
-                    card.style.flexDirection = 'column';
-                    card.innerHTML = `
+                    } else {
+                        card.style.flexDirection = 'column';
+                        card.innerHTML = `
                         <h3 class="news-title" style="margin:0 0 6px 0; font-size:1.05rem; cursor:pointer;">${item.title}</h3>
                         <div style="font-size:0.78rem; color:#999; margin-bottom:6px;">${item.tarih}</div>
                         <p style="margin:0 0 8px 0; color:#ddd;">${summaryHtml}</p>
@@ -166,43 +189,47 @@
                             </div>
                         </div>
                     `;
-                }
-
-                container.appendChild(card);
-
-                // Attach toggle behavior: clicking the button or title toggles vertical expansion
-                const toggleBtn = card.querySelector('.toggle-news');
-                const closeBtn = card.querySelector('.close-news');
-                const full = card.querySelector('.full-content');
-                const titleEl = card.querySelector('.news-title');
-                const doToggle = () => {
-                    if (!full) return;
-                    const isExpanded = card.classList.contains('expanded');
-                    if (isExpanded) {
-                        // collapse
-                        card.classList.remove('expanded');
-                        full.style.maxHeight = '0';
-                        if (toggleBtn) { toggleBtn.style.display = 'inline-block'; toggleBtn.textContent = 'HABERİ OKU'; }
-                        if (closeBtn) closeBtn.style.display = 'none';
-                    } else {
-                        // expand vertically: change layout then open content
-                        card.classList.add('expanded');
-                        // give browser a moment to apply styles (image resize), then set maxHeight
-                        setTimeout(() => {
-                            try {
-                                full.style.maxHeight = full.scrollHeight + 'px';
-                            } catch (e) {
-                                full.style.maxHeight = '500px';
-                            }
-                        }, 50);
-                        if (toggleBtn) toggleBtn.style.display = 'none';
-                        if (closeBtn) { closeBtn.style.display = 'inline-block'; }
                     }
-                };
-                if (toggleBtn) toggleBtn.addEventListener('click', doToggle);
-                if (titleEl) titleEl.addEventListener('click', doToggle);
-                if (closeBtn) closeBtn.addEventListener('click', doToggle);
-            });
+
+                    container.appendChild(card);
+
+                    // Attach toggle behavior: clicking the button or title toggles vertical expansion
+                    const toggleBtn = card.querySelector('.toggle-news');
+                    const closeBtn = card.querySelector('.close-news');
+                    const full = card.querySelector('.full-content');
+                    const titleEl = card.querySelector('.news-title');
+                    const doToggle = () => {
+                        if (!full) return;
+                        const isExpanded = card.classList.contains('expanded');
+                        if (isExpanded) {
+                            // collapse
+                            card.classList.remove('expanded');
+                            full.style.maxHeight = '0';
+                            if (toggleBtn) { toggleBtn.style.display = 'inline-block'; toggleBtn.textContent = 'HABERİ OKU'; }
+                            if (closeBtn) closeBtn.style.display = 'none';
+                        } else {
+                            // expand vertically: change layout then open content
+                            card.classList.add('expanded');
+                            // give browser a moment to apply styles (image resize), then set maxHeight
+                            setTimeout(() => {
+                                try {
+                                    full.style.maxHeight = full.scrollHeight + 'px';
+                                } catch (e) {
+                                    full.style.maxHeight = '500px';
+                                }
+                            }, 50);
+                            if (toggleBtn) toggleBtn.style.display = 'none';
+                            if (closeBtn) { closeBtn.style.display = 'inline-block'; }
+                        }
+                    };
+                    if (toggleBtn) toggleBtn.addEventListener('click', doToggle);
+                    if (titleEl) titleEl.addEventListener('click', doToggle);
+                    if (closeBtn) closeBtn.addEventListener('click', doToggle);
+                });
+            } catch (error) {
+                console.error('Haber yükleme hatası:', error);
+                container.innerHTML = '<p style="color:#f00; text-align:center;">Haberler yüklenirken hata oluştu.</p>';
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
